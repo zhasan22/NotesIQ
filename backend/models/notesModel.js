@@ -19,7 +19,7 @@ const findAllNotesByUserID = async (userId) => {
 };
 
 const findNoteByNoteID = async (noteId) => {
-  const result = await pool.query("SELECT * FROM notes id = $1", [noteId]);
+  const result = await pool.query("SELECT * FROM notes WHERE id = $1", [noteId]);
   return result.rows[0];
 };
 

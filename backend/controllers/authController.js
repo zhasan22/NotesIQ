@@ -40,14 +40,15 @@ const signup = async (req, res) => {
       token
     );
 
-    // Send verification email
-    const verificationUrl = `http://localhost:5000/auth/verify/${token}`;
+    // If email credentials are configured, send verification email
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      const verificationUrl = `http://localhost:5000/auth/verify/${token}`;
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: "Verify your email",
-      html: `
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "Verify your email",
+        html: `
   <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
     <h2 style="color: #333; text-align: center;">Welcome to Note Taker Prototype! </h2>
     <p style="font-size: 16px; color: #555;">
@@ -70,21 +71,33 @@ const signup = async (req, res) => {
     </p>
   </div>
 `,
-    };
+      };
 
-    await transporter.sendMail(mailOptions);
+      await transporter.sendMail(mailOptions);
+      logger.info({ userId: newUser.id, email }, "New user signed up and verification email sent");
 
-    logger.info({ userId: newUser.id, email }, "New user signed up and verification email sent");
+      res.status(201).json({
+        message: "User created, Verify email now",
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          email: newUser.email,
+        },
+      });
+    } else {
+      // No email configured — auto-verify for local development
+      await userModel.markUserAsVerified(newUser.id);
+      logger.info({ userId: newUser.id, email }, "New user signed up and auto-verified (no email configured)");
 
-
-    res.status(201).json({
-      message: "User created, Verify email now",
-      user: {
-        id: newUser.id,
-        username: newUser.username,
-        email: newUser.email,
-      },
-    });
+      res.status(201).json({
+        message: "User created and auto-verified (local dev mode)",
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          email: newUser.email,
+        },
+      });
+    }
   } catch (error) {
     logger.error({ err: error }, "Signup error");
     res.status(500).json({ error: "Internal server error" });

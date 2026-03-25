@@ -5,6 +5,7 @@ import {
   FaHome,
   FaStickyNote,
   FaSignOutAlt,
+  FaCog,
 } from "react-icons/fa";
 import { FaScroll } from "react-icons/fa";
 import "./sidebar.css";
@@ -23,6 +24,7 @@ function Sidebar() {
   const navigate = useNavigate();
   const { token, logout } = useAuth();
   const [username, setUsername] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(null);
 
   const handleLogout = () => {
     logout();
@@ -49,6 +51,7 @@ function Sidebar() {
         const data = await response.json();
 
         setUsername(data.username);
+        if (data.avatar_url) setAvatarUrl(data.avatar_url);
       } catch (err) {
         console.error("Error loading user info:", err);
       }
@@ -67,12 +70,15 @@ function Sidebar() {
 
       <div className="sidebar-content">
         {/* User Profile Section */}
-        <div className="user-profile" onClick={() => navigate("/user")}>
+        <div className="user-profile" onClick={() => handleNavigation("settings")}>
           <div className="avatar-container">
-            <FaUserCircle className="user-avatar" />
+            {avatarUrl
+              ? <img src={avatarUrl} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'12px'}} />
+              : <FaUserCircle className="user-avatar" />}
           </div>
           <div className="user-info">
             <div className="user-name">{username}</div>
+            <div className="user-status">Settings</div>
           </div>
         </div>
 
@@ -103,6 +109,15 @@ function Sidebar() {
               {activeSection === "notes" && (
                 <div className="active-indicator"></div>
               )}
+            </li>
+            <li
+              className={`nav-item ${activeSection === "settings" ? "active" : ""}`}
+              onClick={() => handleNavigation("settings")}
+            >
+              <div className="nav-item-content">
+                <FaCog className="nav-icon" />
+                <span>Settings</span>
+              </div>
             </li>
           </ul>
         </nav>

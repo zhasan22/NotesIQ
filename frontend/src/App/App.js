@@ -7,6 +7,7 @@ import Login from '../Authentication/Login';
 import SignUp from '../Authentication/SignUp';
 import Screen from './Screen';
 import Dashboard from '../Dashboard/Dashboard';
+import Settings from '../Dashboard/Settings';
 // import UserPage from './UserPage';
 
 import Layout from '../App/AppLayout'; // New layout with Sidebar
@@ -27,6 +28,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/notes" element={<Screen />} />
             <Route path="/home" element={<Dashboard />} />
+            <Route path="/settings" element={<Settings />} />
             {/*<Route path="/user" element={<UserPage />} />*/}
           </Route>
         )}

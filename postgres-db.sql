@@ -4,11 +4,23 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    
+    verification_token TEXT,
+    is_verified BOOLEAN DEFAULT FALSE,
+
     -- Metadata
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP,                         -- to track user activity
-    is_active BOOLEAN DEFAULT TRUE,               -- useful for disabling accounts
-    role VARCHAR(20) DEFAULT 'user',              -- e.g., user, admin, moderator
+    last_login TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    role VARCHAR(20) DEFAULT 'user',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- NOTES CREATION TABLE --
+CREATE TABLE notes (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    note_name VARCHAR(255) DEFAULT 'Untitled Note',
+    content_html TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

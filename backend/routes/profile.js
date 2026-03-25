@@ -3,8 +3,9 @@ const router = express.Router();
 const profileController = require('../controllers/profileController');
 const verifyToken = require('../middlewares/verifyToken');
 
-
-// Route: POST /auth/signup
-router.get('/info',verifyToken, profileController.getUserInfo);
+router.get('/info', verifyToken, profileController.getUserInfo);
+router.patch('/username', verifyToken, profileController.updateUsername);
+router.patch('/password', verifyToken, profileController.updatePassword);
+router.patch('/avatar', verifyToken, profileController.updateAvatar);
 
 module.exports = router;

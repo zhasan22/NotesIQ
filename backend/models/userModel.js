@@ -1,18 +1,12 @@
 const pool = require('../db2');
 
-/**
- * Find a user by username and email
- * Returns user row if found, or undefined if not.
- */
-
 const findUserByUserId = async (userId) => {
   const result = await pool.query(
-    'SELECT username, email, joined_at FROM users WHERE id = $1',
+    'SELECT username, email, joined_at, avatar_url FROM users WHERE id = $1',
     [userId]
   );
   return result.rows[0];
 };
-
 
 const findUserByUsername = async (username) => {
   const result = await pool.query(
@@ -38,11 +32,6 @@ const findUserByUsernameOrEmail = async (usernameOrEmail) => {
   return result.rows[0];
 };
 
-
-/**
- * Create a new user.
- * Returns the newly created user row (id and username).
- */
 const createUser = async (username, email, hashedPassword, token) => {
   const result = await pool.query(
     `INSERT INTO users (username, email, password_hash, verification_token) 
@@ -63,8 +52,7 @@ const findUserByVerificationToken = async (token) => {
 
 const markUserAsVerified = async (userId) => {
   await pool.query(
-    `UPDATE users SET is_verified = TRUE, verification_token = NULL
-     WHERE id = $1`,
+    `UPDATE users SET is_verified = TRUE, verification_token = NULL WHERE id = $1`,
     [userId]
   );
 };
@@ -76,6 +64,37 @@ const updateLastLogin = async (userId) => {
   );
 };
 
+const updateUsername = async (userId, newUsername) => {
+  const result = await pool.query(
+    'UPDATE users SET username = $1, updated_at = NOW() WHERE id = $2 RETURNING username',
+    [newUsername, userId]
+  );
+  return result.rows[0];
+};
+
+const updatePassword = async (userId, newHashedPassword) => {
+  await pool.query(
+    'UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2',
+    [newHashedPassword, userId]
+  );
+};
+
+const updateAvatar = async (userId, avatarUrl) => {
+  const result = await pool.query(
+    'UPDATE users SET avatar_url = $1, updated_at = NOW() WHERE id = $2 RETURNING avatar_url',
+    [avatarUrl, userId]
+  );
+  return result.rows[0];
+};
+
+const findPasswordHashById = async (userId) => {
+  const result = await pool.query(
+    'SELECT password_hash FROM users WHERE id = $1',
+    [userId]
+  );
+  return result.rows[0];
+};
+
 module.exports = {
   findUserByUserId,
   findUserByUsername,
@@ -85,4 +104,8 @@ module.exports = {
   createUser,
   updateLastLogin,
   markUserAsVerified,
+  updateUsername,
+  updatePassword,
+  updateAvatar,
+  findPasswordHashById,
 };

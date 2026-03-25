@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-// require('dotenv').config();
+require('dotenv').config();
 const logger = require('./utils/logger');
 
 const authRoutes = require("./routes/auth");
@@ -9,7 +9,7 @@ const profileRoutes = require("./routes/profile");
 
 const app = express();
 app.use(cors({ origin: "http://localhost:3000" })); // your frontend dev port
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 app.use("/auth", authRoutes);
 app.use("/note", noteRoutes);
